@@ -15,13 +15,6 @@ A comprehensive content management platform for marketing teams, built with Reac
 - **Analytics**: Performance tracking and insights
 - **Authentication**: Secure user login system
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js (v18.16.0 or higher)
-- npm or yarn
-
 ## Tech Stack
 
 - **Frontend**: React 18, TypeScript
