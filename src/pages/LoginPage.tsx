@@ -47,6 +47,7 @@ interface LoginPageProps {
     role: string;
     name: string;
   }) => void;
+  onBack?: () => void;
 }
 
 // Adjustable spacing between the left intro section and the right login form

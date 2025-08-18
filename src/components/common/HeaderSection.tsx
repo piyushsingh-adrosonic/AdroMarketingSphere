@@ -3,7 +3,6 @@ import { Input } from "../ui/input";
 import { Badge } from "../ui/badge";
 import { Search, Menu, Bell } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { svgPaths } from "@/assets/icons/svg-paths";
 
 interface HeaderSectionProps {
   setIsSidebarOpen: (open: boolean) => void;

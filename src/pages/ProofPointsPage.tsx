@@ -19,7 +19,7 @@ interface ProofPointsPageProps {
   proofPointsView: string;
   setProofPointsView: (view: string) => void;
   selectedProofPointId: number | null;
-  setSelectedProofPointId: (id: number | null) => void;
+  setSelectedProofPointId?: (id: number | null) => void;
   isProofPointDialogOpen: boolean;
   setIsProofPointDialogOpen: (open: boolean) => void;
   handleProofPointClick: (id: number) => void;
@@ -30,7 +30,6 @@ export const ProofPointsPage = ({
   setCurrentPage,
   searchQuery,
   setSearchQuery,
-  userRole,
   proofPointsView,
   setProofPointsView,
   selectedProofPointId,
