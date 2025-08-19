@@ -9,7 +9,7 @@ import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import {
   Plus, Search, Filter, Calendar as CalendarIcon, ArrowUpRight,
-  ArrowLeft, ArrowRight, Upload, Paperclip
+  ArrowLeft, ArrowRight, Upload, Paperclip, Star
 } from 'lucide-react';
 import { HeaderSection } from "../components/common/HeaderSection";
 import { mockAssets as dataAssets } from "../data/mockData";
@@ -196,13 +196,23 @@ export const AssetsManagementPage = ({
               Manage all your relevant assets at one place
             </p>
           </div>
-          <Button
-            className="bg-[#1a2c47] text-white rounded-[44px] px-4 py-2 hover:bg-[#2a3c57] flex items-center gap-2"
-            onClick={() => setIsUploadDialogOpen(true)}
-          >
-            <Plus className="w-5 h-5" />
-            Add Asset
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="rounded-[44px] border-gray-300 text-sm whitespace-nowrap"
+              onClick={() => import('sonner').then(({ toast }) => toast('Assets by AI is coming soon.'))}
+            >
+              <Star className="w-5 h-5 mr-2" />
+              Assets by AI
+            </Button>
+            <Button
+              className="bg-[#1a2c47] text-white rounded-[44px] px-4 py-2 hover:bg-[#2a3c57] flex items-center gap-2"
+              onClick={() => setIsUploadDialogOpen(true)}
+            >
+              <Plus className="w-5 h-5" />
+              Add Asset
+            </Button>
+          </div>
         </div>
       </div>
 

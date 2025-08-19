@@ -131,6 +131,18 @@ export const PlannerPage = ({
     setIsEditingTask(false);
   };
 
+  // Listen for deep-linking events to open a task from other pages
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('open-planner-task', (window as any)._openPlannerTaskHandler as any);
+    (window as any)._openPlannerTaskHandler = (e: any) => {
+      const id = e?.detail?.taskId;
+      if (typeof id === 'number') {
+        handleTaskClick(id);
+      }
+    };
+    window.addEventListener('open-planner-task', (window as any)._openPlannerTaskHandler);
+  }
+
   return (
     <div className="bg-neutral-50 flex flex-col h-full">
       <HeaderSection setIsSidebarOpen={setIsSidebarOpen} />
@@ -171,10 +183,10 @@ export const PlannerPage = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Quarters</SelectItem>
-                <SelectItem value="Q1">Q1</SelectItem>
-                <SelectItem value="Q2">Q2</SelectItem>
-                <SelectItem value="Q3">Q3</SelectItem>
-                <SelectItem value="Q4">Q4</SelectItem>
+                <SelectItem value="Q1">Q1 2025</SelectItem>
+                <SelectItem value="Q2">Q2 2025</SelectItem>
+                <SelectItem value="Q3">Q3 2025</SelectItem>
+                <SelectItem value="Q4">Q4 2025</SelectItem>
               </SelectContent>
             </Select>
             <Button

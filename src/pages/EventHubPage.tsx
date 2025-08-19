@@ -425,6 +425,24 @@ export const EventHubPage = ({
                             <MapPin className="w-4 h-4" />
                             {event.location}
                           </div>
+                          {(event as any).relatedTaskId !== undefined && (
+                            <div className="flex items-center gap-1">
+                              <a
+                                className="text-blue-600 hover:underline"
+                                href={`/planner?task=${(event as any).relatedTaskId}`}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  const url = `/planner?task=${(event as any).relatedTaskId}`;
+                                  (window as any).openTaskFromQuery = (event as any).relatedTaskId;
+                                  window.history.pushState(null, '', url);
+                                  window.dispatchEvent(new Event('popstate'));
+                                }}
+                              >
+                                Related Task #{(event as any).relatedTaskId}
+                              </a>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -533,7 +551,26 @@ export const EventHubPage = ({
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-4 border-t">
+              <div className="flex justify-between items-center gap-2 pt-4 border-t">
+                {(selectedEvent as any).relatedTaskId !== undefined && (
+                  <div className="text-sm">
+                    <span className="text-gray-600 mr-1">Related Task:</span>
+                    <a
+                      className="text-blue-600 hover:underline"
+                      href={`/planner?task=${(selectedEvent as any).relatedTaskId}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const url = `/planner?task=${(selectedEvent as any).relatedTaskId}`;
+                        (window as any).openTaskFromQuery = (selectedEvent as any).relatedTaskId;
+                        window.history.pushState(null, '', url);
+                        window.dispatchEvent(new Event('popstate'));
+                        setIsEventDetailOpen(false);
+                      }}
+                    >
+                      View Task #{(selectedEvent as any).relatedTaskId}
+                    </a>
+                  </div>
+                )}
                 <Button variant="outline">
                   <Copy className="w-4 h-4 mr-2" />
                   Duplicate

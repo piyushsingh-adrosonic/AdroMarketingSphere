@@ -96,7 +96,7 @@ function MainContent() {
               As the platform evolves, AMS will continue to adapt, learn, and scale alongside the organization — not just as a tool, but as a strategic partner in driving meaningful engagement and measurable growth.
             </p>
           </InfoCard>
-          <InfoCard title="Roles in AMS">
+          {/* <InfoCard title="Roles in AMS">
             <ul className="space-y-3 text-gray-800 mb-10">
             {[
               "Associate",
@@ -134,7 +134,7 @@ function MainContent() {
             <div className={`w-full flex justify-center ${INFOCARD_IMAGE_WRAPPER_MAX_WIDTH_CLASS} mx-auto`}>
               <img src={amscapability} alt="AMS Capabilities" className={`${INFOCARD_IMAGE_CLASS}`} />
             </div>
-          </InfoCard>
+          </InfoCard> */}
         </div>
       </div>
     </div>

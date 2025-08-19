@@ -102,13 +102,6 @@ export const LeadsProspectsPage = ({
     return true;
   });
 
-  // Sorting helpers
-  const parseDealValue = (value?: string) => {
-    if (!value) return 0;
-    const numeric = Number(String(value).replace(/[^0-9.]/g, ''));
-    return isNaN(numeric) ? 0 : numeric;
-  };
-
   const parseQuarter = (timeline?: string) => {
     // Example: "Q3 2025"
     if (!timeline) return { year: 0, quarter: 0 };
@@ -120,8 +113,6 @@ export const LeadsProspectsPage = ({
 
   const sortedLeads = [...filteredLeads].sort((a, b) => {
     switch (selectedSort) {
-      case 'dealValue':
-        return parseDealValue(b.dealValue) - parseDealValue(a.dealValue);
       case 'leadScore':
         return (b.score || 0) - (a.score || 0);
       case 'quarter': {
@@ -151,7 +142,7 @@ export const LeadsProspectsPage = ({
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-[20px] sm:text-[24px] lg:text-[28px] font-medium text-black">Leads & Prospects</h1>
-            <p className="text-[12px] sm:text-[14px] text-gray-600 mt-1">Manage leads and prospects with MQL/SQL classification and Pardot integration</p>
+            <p className="text-[12px] sm:text-[14px] text-gray-600 mt-1">Manage leads and prospects with Marketing Qualified Leads(MQLs)/Sales Qualified Leads(SQLs) classification and Pardot integration</p>
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -175,8 +166,8 @@ export const LeadsProspectsPage = ({
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-4">
           {[
             { label: "Total Leads", value: leadsMetrics.total, color: "text-gray-900" },
-            { label: "Marketing Qualified Leads(MQLs)", value: leadsMetrics.mqls, color: "text-gray-900" },
-            { label: "Sales Qualified Leads(SQLs)", value: leadsMetrics.sqls, color: "text-gray-900" }
+            { label: "Marketing Qualified Leads", value: leadsMetrics.mqls, color: "text-gray-900" },
+            { label: "Sales Qualified Leads", value: leadsMetrics.sqls, color: "text-gray-900" }
           ].map((metric, index) => (
             <Card key={index} className="bg-white border border-gray-200">
               <CardContent className="p-4 sm:p-6">
@@ -224,10 +215,10 @@ export const LeadsProspectsPage = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Quarters</SelectItem>
-                <SelectItem value="Q1">Q1</SelectItem>
-                <SelectItem value="Q2">Q2</SelectItem>
-                <SelectItem value="Q3">Q3</SelectItem>
-                <SelectItem value="Q4">Q4</SelectItem>
+                <SelectItem value="Q1">Q1 2025</SelectItem>
+                <SelectItem value="Q2">Q2 2025</SelectItem>
+                <SelectItem value="Q3">Q3 2025</SelectItem>
+                <SelectItem value="Q4">Q4 2025</SelectItem>
               </SelectContent>
             </Select>
 
@@ -239,8 +230,8 @@ export const LeadsProspectsPage = ({
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="Lead">Lead</SelectItem>
-                <SelectItem value="MQL">MQL</SelectItem>
-                <SelectItem value="SQL">SQL</SelectItem>
+                <SelectItem value="MQL">Marketing Qualified Lead</SelectItem>
+                <SelectItem value="SQL">Sales Qualified Lead</SelectItem>
               </SelectContent>
             </Select>
 
@@ -293,7 +284,6 @@ export const LeadsProspectsPage = ({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Sort</SelectItem>
-                  <SelectItem value="dealValue">Deal Value (High to Low)</SelectItem>
                   <SelectItem value="leadScore">Lead Score (High to Low)</SelectItem>
                   <SelectItem value="quarter">Quarter (Newest First)</SelectItem>
                 </SelectContent>
@@ -326,7 +316,7 @@ export const LeadsProspectsPage = ({
             }`}
             onClick={() => setLeadsView('mqls')}
           >
-            MQLs ({mockLeads.filter(lead => lead.leadType === 'MQL').length})
+            Marketing Qualified Leads ({mockLeads.filter(lead => lead.leadType === 'MQL').length})
           </Button>
           <Button
             variant={leadsView === 'sqls' ? 'default' : 'ghost'}
@@ -337,7 +327,7 @@ export const LeadsProspectsPage = ({
             }`}
             onClick={() => setLeadsView('sqls')}
           >
-            SQLs ({mockLeads.filter(lead => lead.leadType === 'SQL').length})
+            Sales Qualified Leads ({mockLeads.filter(lead => lead.leadType === 'SQL').length})
           </Button>
           {/* Hot Leads tab removed as per requirements */}
         </div>
@@ -387,7 +377,7 @@ export const LeadsProspectsPage = ({
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 lg:gap-4">
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="border-gray-400 text-xs">
-                        {lead.leadType}
+                        {lead.leadType === 'MQL' ? 'Marketing Qualified Lead' : lead.leadType === 'SQL' ? 'Sales Qualified Lead' : lead.leadType}
                       </Badge>
                     </div>
 
@@ -402,7 +392,7 @@ export const LeadsProspectsPage = ({
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   {lead.tags && lead.tags.map((tag, tagIndex) => (
                     <Badge key={tagIndex} variant="outline" className="text-[10px] sm:text-xs border-gray-400">
-                      {tag}
+                      {tag === 'MQL' ? 'Marketing Qualified Lead' : tag === 'SQL' ? 'Sales Qualified Lead' : tag}
                     </Badge>
                   ))}
                 </div>
@@ -460,7 +450,7 @@ export const LeadsProspectsPage = ({
                   <div className="flex flex-col items-end gap-2">
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="border-gray-400 text-xs">
-                        {lead.leadType}
+                        {lead.leadType === 'MQL' ? 'Marketing Qualified Lead' : lead.leadType === 'SQL' ? 'Sales Qualified Lead' : lead.leadType}
                       </Badge>
                     </div>
                   </div>
@@ -471,10 +461,7 @@ export const LeadsProspectsPage = ({
                   <div className="space-y-3">
                     <h4 className="font-medium text-[13px] sm:text-[14px] text-black">Deal Information</h4>
                     <div className="space-y-2 text-[11px] sm:text-[12px]">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Deal Value:</span>
-                        <span className="font-semibold text-black">{lead.dealValue}</span>
-                      </div>
+
                       <div className="flex justify-between">
                         <span className="text-gray-600">Stage:</span>
                         <span className="text-black capitalize">{lead.stage}</span>
@@ -607,8 +594,8 @@ export const LeadsProspectsPage = ({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Lead">Lead</SelectItem>
-                    <SelectItem value="MQL">MQL</SelectItem>
-                    <SelectItem value="SQL">SQL</SelectItem>
+                    <SelectItem value="MQL">Marketing Qualified Lead</SelectItem>
+                    <SelectItem value="SQL">Sales Qualified Lead</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

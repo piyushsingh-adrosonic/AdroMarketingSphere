@@ -23,6 +23,7 @@ interface ContentHubPageProps {
   selectedStatus: string;
   setSelectedStatus: (status: string) => void;
   handleContentClick: (contentId: number) => void;
+  currentUserName?: string;
 }
 
 export const ContentHubPage = ({
@@ -36,7 +37,8 @@ export const ContentHubPage = ({
   setSelectedType,
   selectedStatus,
   setSelectedStatus,
-  handleContentClick
+  handleContentClick,
+  currentUserName
 }: ContentHubPageProps) => {
   // Ensure page content can scroll
   // Wrapper divs already inherit from App; nothing else needed here
@@ -45,6 +47,7 @@ export const ContentHubPage = ({
   const [campaignFilter, setCampaignFilter] = useState<string>('all');
   const [tagsFilter, setTagsFilter] = useState<string>('');
   const [isMoreFiltersOpen, setIsMoreFiltersOpen] = useState<boolean>(false);
+  const [selectedQuarter, setSelectedQuarter] = useState<string>('all');
 
   const uniqueAuthors = Array.from(new Set(contentItems.map((i) => i.author))).sort();
   const uniqueCampaigns = Array.from(new Set(contentItems.map((i) => i.campaign))).sort();
@@ -52,12 +55,44 @@ export const ContentHubPage = ({
   const filteredContent = contentItems.filter(item => {
     const itemStatus = normalizeStatus(item.status);
     const selected = normalizeStatus(selectedStatus);
-    if (activeSection === 'approved-content' && itemStatus !== 'published') return false;
+    // Section-based visibility
+    if (activeSection === 'approved-content') {
+      // Show items that have passed all approvals (approved or published), visible to all users
+      if (!(itemStatus === 'approved' || itemStatus === 'published')) return false;
+    } else {
+      // My Contents: show only items pending approval at any stage (draft or in-review) created by current user
+      const isPending = itemStatus === 'draft' || itemStatus === 'in-review';
+      const isMine = !currentUserName || item.author === currentUserName;
+      if (!(isPending && isMine)) return false;
+    }
     if (searchQuery && !item.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     if (selectedType !== 'all' && item.type.toLowerCase() !== selectedType.toLowerCase()) return false;
     if (selected !== 'all' && itemStatus !== selected) return false;
     if (authorFilter !== 'all' && item.author !== authorFilter) return false;
     if (campaignFilter !== 'all' && item.campaign !== campaignFilter) return false;
+    if (selectedQuarter !== 'all') {
+      const toQuarter = (d: string) => {
+        // Expect DD-MM-YYYY; fallback to Date.parse
+        const parts = String(d || '').split('-').map(Number);
+        let year = 0; let month = 0;
+        if (parts.length === 3 && !parts.some(isNaN)) {
+          year = parts[2];
+          month = parts[1];
+        } else {
+          const t = Date.parse(d as string);
+          if (!isNaN(t)) {
+            const dt = new Date(t);
+            year = dt.getFullYear();
+            month = dt.getMonth() + 1;
+          }
+        }
+        const quarter = month >= 1 && month <= 3 ? 'q1' : month <= 6 ? 'q2' : month <= 9 ? 'q3' : 'q4';
+        return { quarter, year };
+      };
+      const { quarter, year } = toQuarter(item.publishDate);
+      // Match 2025 quarters as per UI labels
+      if (!(year === 2025 && quarter === selectedQuarter)) return false;
+    }
     if (tagsFilter.trim()) {
       const tags = tagsFilter.toLowerCase().split(',').map(t => t.trim()).filter(Boolean);
       const haystack = `${item.title} ${item.content}`.toLowerCase();
@@ -140,7 +175,7 @@ export const ContentHubPage = ({
             }`}
             onClick={() => setActiveSection('my-content')}
           >
-            My Content
+            My Contents
           </Button>
           <Button
             variant={activeSection === 'approved-content' ? 'default' : 'ghost'}
@@ -157,16 +192,16 @@ export const ContentHubPage = ({
 
           <div className="flex items-center gap-2">
             {/* Quarter Filter */}
-            <Select defaultValue="all">
+            <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
               <SelectTrigger className="rounded-full border-gray-300 text-sm w-[140px]">
                 <SelectValue placeholder="Quarter" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Quarters</SelectItem>
-                <SelectItem value="q1">Q1</SelectItem>
-                <SelectItem value="q2">Q2</SelectItem>
-                <SelectItem value="q3">Q3</SelectItem>
-                <SelectItem value="q4">Q4</SelectItem>
+                <SelectItem value="q1">Q1 2025</SelectItem>
+                <SelectItem value="q2">Q2 2025</SelectItem>
+                <SelectItem value="q3">Q3 2025</SelectItem>
+                <SelectItem value="q4">Q4 2025</SelectItem>
               </SelectContent>
             </Select>
 

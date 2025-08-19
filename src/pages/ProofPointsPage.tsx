@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Plus, Search, Calendar, ArrowUpRight, Check, Copy, Share, Edit, Star } from 'lucide-react';
 import { HeaderSection } from "@/components/common/HeaderSection";
-import { getProofPointStatusBadge, handleApproveProofPoint, handleRejectProofPoint } from "@/utils/helpers";
+import { getProofPointStatusBadge, handleApproveProofPoint, handleRejectProofPoint, handleDisapproveProofPoint } from "@/utils/helpers";
 import { mockProofPoints } from "@/data/mockData";
 import { useState, useEffect } from 'react';
 
@@ -54,6 +54,7 @@ export const ProofPointsPage = ({
     // Tabs: Pending Approval / Approved
     if (proofPointsView === 'pending' && point.status !== 'pending') return false;
     if (proofPointsView === 'approved' && point.status !== 'approved') return false;
+    if (proofPointsView === 'rejected' && point.status !== 'rejected') return false;
     // 'all' shows everything
 
     // "All Status" dropdown filter (ignored on Approved tab)
@@ -82,10 +83,28 @@ export const ProofPointsPage = ({
     return true;
   });
 
+  // Determine the oldest proof point by dateAdded (ascending)
+  const oldestProofPointId = (() => {
+    try {
+      const toDate = (d: string) => {
+        // supports formats like DD-MM-YYYY
+        const parts = String(d || '').split('-').map(Number);
+        if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
+        const t = Date.parse(d as string);
+        return isNaN(t) ? Number.POSITIVE_INFINITY : t;
+      };
+      const all = [...mockProofPoints];
+      all.sort((a, b) => toDate(a.dateAdded) - toDate(b.dateAdded));
+      return all[0]?.id ?? null;
+    } catch {
+      return null;
+    }
+  })();
+
   // Calculate proof point metrics
   const approvedCount = mockProofPoints.filter(point => point.status === 'approved').length;
   const pendingCount = mockProofPoints.filter(point => point.status === 'pending').length;
-  const rejectedCount = 6; // Mock rejected count maintained outside of dataset
+  const rejectedCount = mockProofPoints.filter(point => point.status === 'rejected').length;
   const proofPointMetrics = {
     total: approvedCount + pendingCount + rejectedCount,
     approved: approvedCount,
@@ -105,9 +124,13 @@ export const ProofPointsPage = ({
             <p className="text-[12px] sm:text-[14px] text-gray-600 mt-1">Manage all your proof points at one place</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" className="rounded-full border-gray-300 text-sm whitespace-nowrap">
+            <Button
+              variant="outline"
+              className="rounded-full border-gray-300 text-sm whitespace-nowrap"
+              onClick={() => import('sonner').then(({ toast }) => toast('Proof Points by AI is coming soon.'))}
+            >
               <Star className="w-4 h-4 mr-2" />
-              Extracted by AI
+              Proof Points by AI
             </Button>
             <Button
               className="bg-[#1a2c47] text-white rounded-full px-4 py-2 hover:bg-[#2a3c57] text-sm sm:text-base whitespace-nowrap"
@@ -202,6 +225,17 @@ export const ProofPointsPage = ({
             onClick={() => setProofPointsView('approved')}
           >
             Approved ({proofPointMetrics.approved})
+          </Button>
+          <Button
+            variant={proofPointsView === 'rejected' ? 'default' : 'ghost'}
+            className={`rounded-full px-3 sm:px-4 py-1 text-xs sm:text-sm font-semibold whitespace-nowrap ${
+              proofPointsView === 'rejected'
+                ? 'bg-white text-black shadow-sm'
+                : 'text-black hover:bg-gray-100'
+            }`}
+            onClick={() => setProofPointsView('rejected')}
+          >
+            Rejected ({proofPointMetrics.rejected})
           </Button>
         </div>
       </div>
@@ -403,21 +437,55 @@ export const ProofPointsPage = ({
                     </Button>
                   </div>
 
-                  {/* Approve/Reject CTAs */}
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      className="bg-[#1a2c47] text-white hover:bg-[#2a3c57] rounded-full text-xs sm:text-sm"
-                      onClick={() => handleApproveProofPoint(proofPoint.id, setIsProofPointDialogOpen)}
-                    >
-                      Approve
-                    </Button>
-                    <Button
-                      className="bg-[#c33142] text-white hover:bg-red-700 rounded-full text-xs sm:text-sm"
-                      onClick={() => handleRejectProofPoint(proofPoint.id, setIsProofPointDialogOpen)}
-                    >
-                      Reject
-                    </Button>
-                  </div>
+                  {/* Approve/Reject or Disapprove CTAs */}
+                  {proofPoint.status === 'approved' ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        className="bg-[#6b7280] text-white hover:bg-[#6b7280] cursor-not-allowed rounded-full text-xs sm:text-sm"
+                        disabled
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        className="bg-[#c33142] text-white hover:bg-red-700 rounded-full text-xs sm:text-sm"
+                        onClick={() => handleDisapproveProofPoint(proofPoint.id, setIsProofPointDialogOpen)}
+                      >
+                        Disapprove
+                      </Button>
+                    </div>
+                  ) : proofPoint.status === 'rejected' ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        className={`rounded-full text-xs sm:text-sm ${proofPoint.id === oldestProofPointId ? 'bg-[#9aa4b2] text-white cursor-not-allowed hover:bg-[#9aa4b2]' : 'bg-[#1a2c47] text-white hover:bg-[#2a3c57]'}`}
+                        onClick={() => proofPoint.id !== oldestProofPointId && handleApproveProofPoint(proofPoint.id, setIsProofPointDialogOpen)}
+                        disabled={proofPoint.id === oldestProofPointId}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        className="bg-[#6b7280] text-white hover:bg-[#6b7280] cursor-not-allowed rounded-full text-xs sm:text-sm"
+                        disabled
+                      >
+                        Disapprove
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        className={`rounded-full text-xs sm:text-sm ${proofPoint.id === oldestProofPointId ? 'bg-[#9aa4b2] text-white cursor-not-allowed hover:bg-[#9aa4b2]' : 'bg-[#1a2c47] text-white hover:bg-[#2a3c57]'}`}
+                        onClick={() => proofPoint.id !== oldestProofPointId && handleApproveProofPoint(proofPoint.id, setIsProofPointDialogOpen)}
+                        disabled={proofPoint.id === oldestProofPointId}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        className="bg-[#c33142] text-white hover:bg-red-700 rounded-full text-xs sm:text-sm"
+                        onClick={() => handleRejectProofPoint(proofPoint.id, setIsProofPointDialogOpen)}
+                      >
+                        Reject
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             );

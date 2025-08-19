@@ -16,9 +16,9 @@ const validCredentials = [
   },
   {
     email: "marketing@adrosonic.com",
-    password: "Marketing@123",
-    role: "Marketing Head",
-    name: "Matt Pesce"
+    password: "1234",
+    role: "admin",
+    name: "Marketing Admin"
   },
   {
     email: "piyush.singh@adrosonic.com",

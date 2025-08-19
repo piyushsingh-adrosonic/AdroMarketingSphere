@@ -71,12 +71,24 @@ export const ContentEditorPage = ({
     }
   };
 
+  // Milestone helpers
+  const normalize = (v: string | undefined | null) => String(v || '').trim().toLowerCase().replace(/\s+/g, '-');
+  const normalizedStatus = normalize(content?.status);
+  const stageOrder = ['draft', 'in-review', 'approved', 'published'] as const;
+  const currentStageIndex = (() => {
+    const idx = stageOrder.indexOf(normalizedStatus as typeof stageOrder[number]);
+    if (idx >= 0) return idx;
+    // Fallback: map common variants
+    if (normalizedStatus === 'inreview') return 1;
+    return 0;
+  })();
+
   return (
     <div className="bg-neutral-50 flex flex-col h-full">
       <HeaderSection setIsSidebarOpen={setIsSidebarOpen} />
 
       <div className="px-4 sm:px-6 py-4 sm:py-6">
-        <div className="flex items-center gap-4 sm:gap-6 mb-4 sm:mb-6">
+        <div className="flex items-center gap-4 sm:gap-6 mb-2 sm:mb-3">
           <Button
             variant="ghost"
             size="icon"
@@ -99,6 +111,34 @@ export const ContentEditorPage = ({
             <Badge className="bg-gray-100 text-black px-1 py-0 rounded text-[11px] sm:text-[12px]">
               AI Generated
             </Badge>
+          </div>
+        </div>
+
+        {/* Milestone Bar */}
+        <div className="mb-4 sm:mb-6">
+          <div className="w-full h-2 rounded-full bg-gray-200 overflow-hidden">
+            <div
+              className={`${currentStageIndex >= 0 ? 'bg-[#1a2c47]' : 'bg-gray-300'} h-2 transition-all`}
+              style={{ width: `${((currentStageIndex + 1) / 4) * 100}%` }}
+            />
+          </div>
+          <div className="flex justify-between mt-1.5">
+            {stageOrder.map((stage, idx) => (
+              <div key={stage} className="flex items-center gap-1">
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    idx <= currentStageIndex ? 'bg-[#1a2c47]' : 'bg-gray-300'
+                  }`}
+                />
+                <span
+                  className={`text-[10px] sm:text-[11px] ${
+                    idx === currentStageIndex ? 'text-[#1a2c47] font-semibold' : 'text-gray-600'
+                  }`}
+                >
+                  {stage === 'in-review' ? 'In Review' : stage.charAt(0).toUpperCase() + stage.slice(1)}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -317,6 +357,7 @@ export const ContentEditorPage = ({
                               variant="ghost"
                               size="sm"
                               className="text-[10px] sm:text-[11px] font-semibold text-green-600 hover:text-green-800 p-0 h-auto"
+                              onClick={() => toast.success('This feedback has been resolved.')}
                             >
                               <CheckSquare className="w-3 h-3 mr-1" />
                               Mark as resolved
@@ -327,6 +368,7 @@ export const ContentEditorPage = ({
                               variant="ghost"
                               size="sm"
                               className="text-[10px] sm:text-[11px] font-semibold text-blue-600 hover:text-blue-800 p-0 h-auto"
+                              onClick={() => toast('This feedback has been applied.', { className: 'bg-blue-50 text-blue-900 border border-blue-200' })}
                             >
                               Apply Feedback
                               <ArrowRightCircle className="w-3 h-3 ml-1" />

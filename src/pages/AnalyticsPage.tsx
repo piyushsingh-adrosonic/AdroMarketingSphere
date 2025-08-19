@@ -153,8 +153,8 @@ export const AnalyticsPage = ({
 
   // helpers can be added when wiring real APIs
 
-  // Additional datasets for new analytics tabs
-  const liPageTrend = [
+  // Additional datasets for new analytics tabs (base, unfiltered)
+  const liPageTrendBase = [
     { m: 'Jan', followers: 1200, views: 3400, unique: 1200 },
     { m: 'Feb', followers: 1320, views: 3200, unique: 1150 },
     { m: 'Mar', followers: 1490, views: 3800, unique: 1300 },
@@ -163,14 +163,14 @@ export const AnalyticsPage = ({
     { m: 'Jun', followers: 1940, views: 4500, unique: 1520 },
     { m: 'Jul', followers: 2100, views: 4800, unique: 1650 }
   ];
-  const liDemographics = [
+  const liDemographicsBase = [
     { name: 'IT', value: 35, color: '#3b82f6' },
     { name: 'Finance', value: 22, color: '#10b981' },
     { name: 'Healthcare', value: 18, color: '#f59e0b' },
     { name: 'Manufacturing', value: 15, color: '#ef4444' },
     { name: 'Other', value: 10, color: '#8b5cf6' }
   ];
-  const liPostMetrics = [
+  const liPostMetricsBase = [
     { post: 'Launch', impressions: 5400, reach: 4100, likes: 120, comments: 35, shares: 18, url: 'https://www.linkedin.com/feed/update/urn:li:activity:launch' },
     { post: 'Webinar', impressions: 4300, reach: 3600, likes: 160, comments: 28, shares: 24, url: 'https://www.linkedin.com/feed/update/urn:li:activity:webinar' },
     { post: 'Case Study', impressions: 6200, reach: 4700, likes: 210, comments: 40, shares: 32, url: 'https://www.linkedin.com/feed/update/urn:li:activity:casestudy' },
@@ -180,6 +180,71 @@ export const AnalyticsPage = ({
     { label: 'Ads', ctr: 1.6, change: -0.2 },
     { label: 'Posts', ctr: 2.9, change: 0.6 }
   ];
+
+  // Lightweight mock transformation for range and region filters
+  const rangeToCount: Record<string, number> = { '7days': 1, '30days': 3, '90days': 6, '1year': 7, 'custom': 7 };
+  const regionFactor: Record<string, number> = { all: 1, uk: 0.22, usa: 0.38, latam: 0.2, india: 0.2 };
+
+  const sliceByRange = (arr: any[], range: string) => {
+    const n = rangeToCount[range] ?? 7;
+    return arr.slice(-n);
+  };
+  const scaleNumber = (n: number, factor: number) => Math.round(n * factor);
+  const applyRegion = (arr: { [k: string]: any }[], keys: string[], factor: number) =>
+    arr.map((row) => {
+      const scaled: any = { ...row };
+      keys.forEach((k) => {
+        if (typeof row[k] === 'number') scaled[k] = scaleNumber(row[k], factor);
+      });
+      return scaled;
+    });
+
+  // Compute filtered datasets for LinkedIn Page Level
+  const liPageTrend = applyRegion(
+    sliceByRange(liPageTrendBase, liPageRange),
+    ['followers', 'views', 'unique'],
+    regionFactor[liRegion] ?? 1
+  );
+  const liDemographics = applyRegion(liDemographicsBase, ['value'], regionFactor[liRegion] ?? 1).map((d) => ({ ...d, value: Math.max(d.value, 1) }));
+  const liPostMetrics = applyRegion(sliceByRange(liPostMetricsBase, liPostRange), ['impressions', 'reach', 'likes', 'comments', 'shares'], regionFactor[liRegion] ?? 1);
+
+  // Pardot derived metrics/content based on filters
+  const rangeScale = (r: string) => (rangeToCount[r] ?? 7) / 7;
+  const applyCountScale = (nStr: string, r: string, reg: string) => {
+    const n = Number(String(nStr).replace(/[^0-9.]/g, '')) || 0;
+    const scaled = Math.max(1, Math.round(n * (regionFactor[reg] ?? 1) * rangeScale(r)));
+    return scaled.toLocaleString();
+  };
+  const pardotMetrics = {
+    totalContent: applyCountScale(analyticsData.contentMetrics.totalContent, pardotRange, pardotRegion),
+    publishedThisMonth: applyCountScale(analyticsData.contentMetrics.publishedThisMonth, pardotRange, pardotRegion),
+    // leave other deltas/percentages as-is for simplicity
+    contentChange: analyticsData.contentMetrics.contentChange,
+    publishedChange: analyticsData.contentMetrics.publishedChange,
+    avgTimeToPublish: analyticsData.contentMetrics.avgTimeToPublish,
+    timeChange: analyticsData.contentMetrics.timeChange,
+    conversionRate: analyticsData.contentMetrics.conversionRate,
+    conversionChange: analyticsData.contentMetrics.conversionChange
+  };
+  const pardotContentPerformance = applyRegion(
+    sliceByRange(analyticsData.contentPerformance, pardotRange),
+    ['views', 'conversions'],
+    regionFactor[pardotRegion] ?? 1
+  );
+
+  // Google Analytics derived dataset
+  const gaTrend = applyRegion(
+    sliceByRange(analyticsData.chartData.trafficTrend, gaRange),
+    ['engagement', 'views', 'visitors'],
+    regionFactor[gaRegion] ?? 1
+  );
+
+  // Event-based derived insights (scale confidence, slice by range)
+  const eventsInsights = applyRegion(
+    sliceByRange(analyticsData.aiInsights, eventRange),
+    ['confidence'],
+    Math.min(1, regionFactor[eventRegion] ?? 1)
+  ).map((x) => ({ ...x, confidence: Math.max(1, Math.min(100, x.confidence)) }));
 
   return (
     <div className="bg-neutral-50 flex flex-col h-full">
@@ -440,11 +505,11 @@ export const AnalyticsPage = ({
                       <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
                     </div>
                     <p className="text-[24px] sm:text-[32px] lg:text-[36px] text-gray-900 tracking-tight">
-                      {analyticsData.contentMetrics.totalContent}
+                      {pardotMetrics.totalContent}
                     </p>
                     <div className="flex items-center gap-1 mt-2">
                       <span className="text-[11px] sm:text-[12px] text-green-600">
-                        {analyticsData.contentMetrics.contentChange} this month
+                        {pardotMetrics.contentChange} this month
                       </span>
                     </div>
                   </CardContent>
@@ -457,12 +522,12 @@ export const AnalyticsPage = ({
                       <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
                     </div>
                     <p className="text-[24px] sm:text-[32px] lg:text-[36px] text-gray-900 tracking-tight">
-                      {analyticsData.contentMetrics.publishedThisMonth}
+                      {pardotMetrics.publishedThisMonth}
                     </p>
                     <div className="flex items-center gap-1 mt-2">
                       <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
                       <span className="text-[11px] sm:text-[12px] text-green-600">
-                        {analyticsData.contentMetrics.publishedChange}
+                        {pardotMetrics.publishedChange}
                       </span>
                       <span className="text-[11px] sm:text-[12px] text-gray-600">vs last month</span>
                     </div>
@@ -476,12 +541,12 @@ export const AnalyticsPage = ({
                       <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
                     </div>
                     <p className="text-[24px] sm:text-[32px] lg:text-[36px] text-gray-900 tracking-tight">
-                      {analyticsData.contentMetrics.avgTimeToPublish}
+                      {pardotMetrics.avgTimeToPublish}
                     </p>
                     <div className="flex items-center gap-1 mt-2">
                       <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
                       <span className="text-[11px] sm:text-[12px] text-green-600">
-                        {analyticsData.contentMetrics.timeChange}
+                        {pardotMetrics.timeChange}
                       </span>
                       <span className="text-[11px] sm:text-[12px] text-gray-600">improvement</span>
                     </div>
@@ -495,12 +560,12 @@ export const AnalyticsPage = ({
                       <Target className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
                     </div>
                     <p className="text-[24px] sm:text-[32px] lg:text-[36px] text-gray-900 tracking-tight">
-                      {analyticsData.contentMetrics.conversionRate}
+                      {pardotMetrics.conversionRate}
                     </p>
                     <div className="flex items-center gap-1 mt-2">
                       <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
                       <span className="text-[11px] sm:text-[12px] text-green-600">
-                        {analyticsData.contentMetrics.conversionChange}
+                        {pardotMetrics.conversionChange}
                       </span>
                       <span className="text-[11px] sm:text-[12px] text-gray-600">vs last month</span>
                     </div>
@@ -518,7 +583,7 @@ export const AnalyticsPage = ({
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {analyticsData.contentPerformance.map((content, index) => (
+                    {pardotContentPerformance.map((content, index) => (
                       <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                         <div className="flex-1 min-w-0">
                           <h4 className="text-[13px] sm:text-[14px] text-black mb-2 line-clamp-1">
@@ -568,7 +633,7 @@ export const AnalyticsPage = ({
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={analyticsData.chartData.trafficTrend}>
+                      <BarChart data={gaTrend}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="date" />
                         <YAxis />
@@ -660,7 +725,7 @@ export const AnalyticsPage = ({
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {analyticsData.aiInsights.map((insight, index) => (
+                      {eventsInsights.map((insight, index) => (
                         <div key={index} className="bg-white p-4 rounded-lg border border-blue-100">
                           <div className="flex items-center gap-2 mb-3">
                             {insight.type === 'optimization' && <Target className="w-4 h-4 text-green-600" />}

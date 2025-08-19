@@ -147,6 +147,15 @@ export const handleRejectProofPoint = (proofPointId: number, setIsProofPointDial
   setIsProofPointDialogOpen(false);
 };
 
+export const handleDisapproveProofPoint = (
+  proofPointId: number,
+  setIsProofPointDialogOpen: (open: boolean) => void
+) => {
+  console.log('Disapproving proof point:', proofPointId);
+  import('sonner').then(({ toast }) => toast('Proof point disapproved.'));
+  setIsProofPointDialogOpen(false);
+};
+
 export const handleSendMQL = (leadId: number, setIsLeadDialogOpen: (open: boolean) => void) => {
   console.log('Sending MQL to marketing:', leadId);
   import('sonner').then(({ toast }) => toast.success('MQL sent to marketing team.'));

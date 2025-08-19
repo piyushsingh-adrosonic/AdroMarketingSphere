@@ -149,7 +149,7 @@ export default function App() {
     }
   }, [currentPage, isAuthenticated]);
 
-  // Respond to browser back/forward
+  // Respond to browser back/forward and deep links (e.g., /planner?task=ID)
   useEffect(() => {
     const onPopState = () => {
       const slug = readPath();
@@ -163,6 +163,22 @@ export default function App() {
     return () => window.removeEventListener("popstate", onPopState);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
+
+  // Open planner task when query parameter is present
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const search = window.location.search || '';
+    const params = new URLSearchParams(search);
+    const taskIdParam = params.get('task');
+    const taskId = taskIdParam ? Number(taskIdParam) : (window as any).openTaskFromQuery;
+    if (currentPage === 'planner' && taskId) {
+      // open the task dialog via global event
+      const evt = new CustomEvent('open-planner-task', { detail: { taskId } });
+      window.dispatchEvent(evt);
+      // cleanup stored id
+      (window as any).openTaskFromQuery = undefined;
+    }
+  }, [currentPage, isAuthenticated]);
 
   // -------------------------
   // 🔒 Show Landing / Login if not authenticated
@@ -226,6 +242,7 @@ export default function App() {
             selectedStatus={selectedStatus}
             setSelectedStatus={setSelectedStatus}
             handleContentClick={handleContentClick}
+            currentUserName={currentUser?.name}
           />
         )}
 

@@ -76,25 +76,6 @@ export const SidebarNavigation = ({
           </div>
         </div>
 
-        {/* Proof Points */}
-        <div className={`${currentPage === 'proof-points' ? 'bg-[#152339]' : ''} rounded-md`}>
-          <div
-            className="flex items-center px-3 py-3 sm:py-2 text-white cursor-pointer hover:bg-[#152339] transition-colors min-h-[48px]"
-            onClick={() => {
-              console.log('Switching to proof points');
-              setCurrentPage('proof-points');
-              setIsSidebarOpen(false);
-            }}
-          >
-            <div className="w-6 h-6 mr-3 flex-shrink-0">
-              <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
-                <path d={svgPaths.p1ee106c0} stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <span className="font-semibold text-[14px] sm:text-[16px] truncate">Proof Points</span>
-          </div>
-        </div>
-
         {/* Planner */}
         <div className={`${currentPage === 'planner' ? 'bg-[#152339]' : ''} rounded-md`}>
           <div
@@ -114,25 +95,6 @@ export const SidebarNavigation = ({
           </div>
         </div>
 
-        {/* Leads & Prospects */}
-        <div className={`${currentPage === 'leads-prospects' ? 'bg-[#152339]' : ''} rounded-md`}>
-          <div
-            className="flex items-center px-3 py-3 sm:py-2 text-white cursor-pointer hover:bg-[#152339] transition-colors min-h-[48px]"
-            onClick={() => {
-              console.log('Switching to leads & prospects');
-              setCurrentPage('leads-prospects');
-              setIsSidebarOpen(false);
-            }}
-          >
-            <div className="w-6 h-6 mr-3 flex-shrink-0">
-              <svg viewBox="0 0 26 26" fill="none" className="w-6 h-6">
-                <path d={svgPaths.p2382f940} fill="white" />
-              </svg>
-            </div>
-            <span className="font-semibold text-[14px] sm:text-[16px] truncate">Leads & Prospects</span>
-          </div>
-        </div>
-
         {/* Event Hub */}
         <div className={`${currentPage === 'event-hub' ? 'bg-[#152339]' : ''} rounded-md`}>
           <div
@@ -149,6 +111,44 @@ export const SidebarNavigation = ({
               </svg>
             </div>
             <span className="font-semibold text-[14px] sm:text-[16px] truncate">Event Hub</span>
+          </div>
+        </div>
+
+        {/* Proof Points */}
+        <div className={`${currentPage === 'proof-points' ? 'bg-[#152339]' : ''} rounded-md`}>
+          <div
+            className="flex items-center px-3 py-3 sm:py-2 text-white cursor-pointer hover:bg-[#152339] transition-colors min-h-[48px]"
+            onClick={() => {
+              console.log('Switching to proof points');
+              setCurrentPage('proof-points');
+              setIsSidebarOpen(false);
+            }}
+          >
+            <div className="w-6 h-6 mr-3 flex-shrink-0">
+              <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
+                <path d={svgPaths.p1ee106c0} stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <span className="font-semibold text-[14px] sm:text-[16px] truncate">Proof Points</span>
+          </div>
+        </div>
+
+        {/* Leads & Prospects */}
+        <div className={`${currentPage === 'leads-prospects' ? 'bg-[#152339]' : ''} rounded-md`}>
+          <div
+            className="flex items-center px-3 py-3 sm:py-2 text-white cursor-pointer hover:bg-[#152339] transition-colors min-h-[48px]"
+            onClick={() => {
+              console.log('Switching to leads & prospects');
+              setCurrentPage('leads-prospects');
+              setIsSidebarOpen(false);
+            }}
+          >
+            <div className="w-6 h-6 mr-3 flex-shrink-0">
+              <svg viewBox="0 0 26 26" fill="none" className="w-6 h-6">
+                <path d={svgPaths.p2382f940} fill="white" />
+              </svg>
+            </div>
+            <span className="font-semibold text-[14px] sm:text-[16px] truncate">Leads & Prospects</span>
           </div>
         </div>
 

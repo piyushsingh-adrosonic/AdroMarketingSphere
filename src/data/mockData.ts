@@ -1560,6 +1560,33 @@ export const contentItems = [
     content: "Whitepaper detailing cross-selling strategies and AI-driven recommendations in B2B insurance.",
     reviewStage: "Marketing Head Review"
   }
+  ,
+  // ---- Added few items for 'My Contents' authored by current user (e.g., Piyush Singh) ----
+  {
+    id: 121,
+    title: "Case Study: Automating Claims Adjudication",
+    type: "Case Study",
+    status: "Draft",
+    campaign: "Q4 Campaign",
+    author: "Piyush Singh",
+    timeSpent: "1.5 hours",
+    publishDate: "28-09-2025",
+    comments: 1,
+    content: "Initial draft outlining automation-led improvements in claims adjudication for marine insurance.",
+    reviewStage: "Initial Draft Review"
+  },
+  {
+    id: 122,
+    title: "Blog: Practical GenAI Patterns for Marketing Teams",
+    type: "Blog",
+    status: "In review",
+    campaign: "AI Initiative",
+    author: "Piyush Singh",
+    timeSpent: "2 hours",
+    publishDate: "05-10-2025",
+    comments: 2,
+    content: "Full spectrum of testing (functional, automation, and performance)\n\nAll types of migration (data, policies, trading certificates, etc.)\n\nManagement Information (MI) reports and dashboards\n\nSubstantially reduced unit costs for application testing and quality assurance\n\nImplementation Strategy:\n\nDetailed implementation approach with specific examples and case studies that demonstrate practical application of the concepts discussed."
+  }
 ];
 
 // Mock Tasks Data for Planner
@@ -1734,7 +1761,7 @@ export const mockTasks = [
   {
     id: 7,
     title: "Email campaign setup for lead nurturing",
-    description: "Set up automated email sequences for MQL nurturing campaign",
+    description: "Set up automated email sequences for Market Qualified Leads nurturing campaign",
     status: "done",
     priority: "medium",
     assignedTo: {
@@ -1951,6 +1978,7 @@ export const mockEvents = [
         initials: "AS"
       }
     ],
+    relatedTaskId: 1,
     milestones: [
       {
         id: 1,
@@ -1994,6 +2022,7 @@ export const mockEvents = [
         initials: "DK"
       }
     ],
+    relatedTaskId: 2,
     milestones: [
       {
         id: 3,
@@ -2037,6 +2066,7 @@ export const mockEvents = [
         initials: "RC"
       }
     ],
+    relatedTaskId: 3,
     milestones: [
       {
         id: 5,
