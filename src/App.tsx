@@ -16,7 +16,7 @@ import { AMSInfoPage } from "@/pages/AMSInfoPage";
 
 export default function App() {
   // Authentication state
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [currentUser, setCurrentUser] = useState<{
     email: string;
     rememberMe: boolean;
@@ -28,7 +28,7 @@ export default function App() {
   const [preAuthPage, setPreAuthPage] = useState<"landing" | "login">("landing");
 
   // UI / app states
-  const [currentPage, setCurrentPage] = useState("content-hub");
+  const [currentPage, setCurrentPage] = useState("ams-info");
   const [selectedContentId, setSelectedContentId] = useState<number | null>(null);
   const [selectedProofPointId, setSelectedProofPointId] = useState<number | null>(
     null
