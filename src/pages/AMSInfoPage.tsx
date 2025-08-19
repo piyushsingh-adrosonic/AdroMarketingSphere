@@ -1,8 +1,6 @@
 import { HeaderSection } from "@/components/common/HeaderSection";
 import amslogo from "@/assets/images/Adromarketlogo.png";
-import amscapability from "@/assets/images/ams-capable.png";
-import roles from "@/assets/images/roles-in-ams.jpg";
-import { CheckCircle2 } from "lucide-react";
+// Removed unused image/icon imports to resolve TS6133 errors
 
 interface AMSInfoPageProps {
   setIsSidebarOpen: (open: boolean) => void;
@@ -12,10 +10,7 @@ interface AMSInfoPageProps {
 // Tweak these classes to increase/decrease sizes globally for all InfoCards
 const INFOCARD_TITLE_SIZE_CLASS = "text-[26px] sm:text-[30px]";
 const INFOCARD_BODY_SIZE_CLASS = "text-[15px] sm:text-[16px]";
-// Adjustable image sizing for InfoCards
-// Edit these to change image dimensions/alignment in ALL infocards on this page
-const INFOCARD_IMAGE_WRAPPER_MAX_WIDTH_CLASS = "max-w-4xl"; // overall width cap for image container
-const INFOCARD_IMAGE_CLASS = "mx-auto max-h-[32rem] max-w-full w-auto object-contain"; // centered, proportional
+// (Removed unused image size constants that were only used by commented sections)
 
 function HeroSection() {
   return (
