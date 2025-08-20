@@ -42,7 +42,7 @@ export function LandingPage({ onSwitchToLogin }: { onSwitchToLogin: () => void }
         <div className="flex-1 max-w-xl animate-slide-up">
           <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 text-[#1a2c47] px-3 py-1 text-xs font-medium ring-1 ring-blue-100 mb-4 animate-fade-in">
             <span className="h-1.5 w-1.5 rounded-full bg-[#1a2c47]" />
-            AI-powered workspace
+            AI-powered Platform
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4 animate-pop-in">
             Welcome to <span className="text-[#1a2c47]">AMS</span>
@@ -53,7 +53,7 @@ export function LandingPage({ onSwitchToLogin }: { onSwitchToLogin: () => void }
 
           <ul className="space-y-3 text-gray-800 mb-10 animate-fade-in">
             {[
-              "All-in-One Workspace",
+              "All-in-One Platform",
               "Intelligent Assistance",
               "Workflow Automation",
               "Integrated Insights",
