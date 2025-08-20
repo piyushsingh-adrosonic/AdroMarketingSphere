@@ -646,8 +646,6 @@ export const LeadsProspectsPage = ({
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="outline" onClick={() => setIsCreateLeadOpen(false)}>Cancel</Button>
               <Button className="bg-[#1a2c47] text-white hover:bg-[#2a3c57]" onClick={() => { import('sonner').then(({ toast }) => toast.success('Lead sent for approval.')); setIsCreateLeadOpen(false); }}>Send for Approval</Button>
-              <Button className="bg-green-600 text-white hover:bg-green-700" onClick={() => { import('sonner').then(({ toast }) => toast.success('Lead saved as SQL.')); setIsCreateLeadOpen(false); }}>Send to SQL</Button>
-              <Button className="bg-blue-600 text-white hover:bg-blue-700" onClick={() => { import('sonner').then(({ toast }) => toast.success('Lead saved as MQL.')); setIsCreateLeadOpen(false); }}>Send to MQL</Button>
             </div>
           </div>
         </DialogContent>

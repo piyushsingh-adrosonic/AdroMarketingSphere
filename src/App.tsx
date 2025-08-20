@@ -76,18 +76,21 @@ export default function App() {
     setUserRole("marketing-head");
   };
 
-  // 🔑 Auto-login from localStorage
+  // 🔑 Auto-login from localStorage (only if user opted Remember Me)
   useEffect(() => {
     const storedUser = localStorage.getItem("ams_user");
-    if (storedUser) {
-      try {
-        const userData = JSON.parse(storedUser);
+    if (!storedUser) return;
+    try {
+      const userData = JSON.parse(storedUser);
+      if (userData?.rememberMe) {
         setCurrentUser(userData);
         setUserRole(userData.role || "marketing-head");
         setIsAuthenticated(true);
-      } catch {
+      } else {
         localStorage.removeItem("ams_user");
       }
+    } catch {
+      localStorage.removeItem("ams_user");
     }
   }, []);
 
@@ -119,12 +122,9 @@ export default function App() {
   useEffect(() => {
     const slug = readPath();
     if (!isAuthenticated) {
-      if (preAuthRoutes.has(slug as any)) {
-        setPreAuthPage((slug as "landing" | "login") || "landing");
-      } else {
-        window.history.replaceState(null, "", "/landing");
-        setPreAuthPage("landing");
-      }
+      // Always force unauthenticated users to Landing/Login space
+      window.history.replaceState(null, "", "/landing");
+      setPreAuthPage("landing");
     } else {
       if (appRoutes.has(slug as any)) {
         setCurrentPage(slug);
@@ -134,6 +134,14 @@ export default function App() {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
+
+  // Hard guard: if user becomes unauthenticated while on an app route, send to Landing
+  useEffect(() => {
+    if (!isAuthenticated) {
+      window.history.replaceState(null, "", "/landing");
+      setPreAuthPage("landing");
+    }
   }, [isAuthenticated]);
 
   // Keep path in sync when page changes
