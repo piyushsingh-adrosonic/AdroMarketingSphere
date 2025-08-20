@@ -113,7 +113,7 @@ function MainContent() {
           <InfoCard title="AMS Capabilities">
             <ul className="space-y-3 text-gray-800 mb-10">
             {[
-              "All-in-One Workspace",
+              "All-in-One Platform",
               "Intelligent Assistance",
               "Workflow Automation",
               "Integrated Insights",
